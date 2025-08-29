@@ -29,6 +29,7 @@
         .big{font-size:2.3rem;font-weight:800;letter-spacing:.5px}
         .btn{appearance:none;border:0;border-radius:14px;padding:10px 14px;background:rgba(255,255,255,.1);color:var(--text);font-weight:600}
         .btn:hover{background:rgba(255,255,255,.15);cursor:pointer}
+        .btn:disabled, .btn:disabled:hover { background: rgba(255,255,255,0.05); color: var(--muted); cursor: not-allowed; }
         .note{color:var(--muted);font-size:.95rem}
         .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
         .grid-2{display:grid;gap:12px}
@@ -134,8 +135,8 @@
             <div class="row">
                 <h2>Uitkomst</h2>
                 <div class="flex gap-2">
-                    <button class="btn" id="save-btn" type="button">Test opslaan</button>
-                    <button class="btn" id="reset" type="button">Alles wissen</button>
+                    <button class="btn" id="save-btn" type="button" disabled>Test opslaan</button>
+                    <button class="btn" id="reset" type="button" disabled>Alles wissen</button>
                 </div>
             </div>
             <div class="row">
@@ -155,7 +156,7 @@
         <section class="card history-section">
             <div class="row">
                 <h2>Geschiedenis van zelftests</h2>
-                <button class="btn" id="export-history-btn">Exporteer naar Excel</button>
+                <button class="btn" id="export-history-btn" disabled>Exporteer naar Excel</button>
             </div>
             <!-- Gebruikers-ID om te delen -->
             <p id="userIdDisplay" class="note muted">Laden...</p>
@@ -200,6 +201,9 @@
                     // Toon gebruikers-ID in de UI
                     const userIdDisplay = document.getElementById('userIdDisplay');
                     userIdDisplay.textContent = `Je gebruikers-ID: ${userId}`;
+
+                    // Activeer de knoppen zodra de authenticatie klaar is
+                    enableButtons();
 
                     // Start het luisteren naar de geschiedenis zodra de gebruiker is geverifieerd
                     displayHistory();
@@ -497,6 +501,15 @@
                 console.error("Fout bij het wissen van gegevens: ", e);
                 showMessage('Fout bij het wissen van de geschiedenis.', 'err');
             }
+        }
+
+        /**
+         * Activeert de knoppen zodra de Firebase-authenticatie is voltooid.
+         */
+        function enableButtons() {
+            document.getElementById('save-btn').disabled = false;
+            document.getElementById('reset').disabled = false;
+            document.getElementById('export-history-btn').disabled = false;
         }
 
         // Event listeners
