@@ -200,7 +200,7 @@
     
     <div id="loading-overlay" class="loading-overlay" style="display: none;">
         <div class="spinner"></div>
-        <p>Aan het laden...</p>
+        <p id="loading-text">Aan het laden...</p>
     </div>
 
     <script type="module">
@@ -213,10 +213,13 @@
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        let db, auth, userId, isAuthReady = false;
+        let db, auth, userId;
 
         const loadingOverlay = document.getElementById('loading-overlay');
-        const showLoading = (show) => {
+        const loadingText = document.getElementById('loading-text');
+
+        const showLoading = (show, message = "Aan het laden...") => {
+            loadingText.textContent = message;
             loadingOverlay.style.display = show ? 'flex' : 'none';
         };
 
@@ -225,45 +228,37 @@
         auth = getAuth(app);
         db = getFirestore(app);
 
-        // Functie om de gebruiker in te loggen en de applicatie te initialiseren
-        const initApp = async () => {
-            showLoading(true);
-            try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Firebase Auth-fout:", error);
-            } finally {
-                // De onAuthStateChanged-listener handelt de rest af
-            }
-        };
-
         // Zorg ervoor dat de app pas werkt als de authenticatiestatus bekend is
-        onAuthStateChanged(auth, (user) => {
+        showLoading(true, "Authenticatie wordt gestart...");
+
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
+                // Gebruiker is succesvol ingelogd
                 userId = user.uid;
-                isAuthReady = true;
                 showLoading(false);
                 setupRealtimeListener();
             } else {
-                // Als de gebruiker uitgelogd is, en het is de eerste keer, start het inlogproces
-                if (!isAuthReady) {
-                    initApp();
-                } else {
-                    // Als de gebruiker uitlogt na een succesvolle sessie, reset de UI.
-                    isAuthReady = false;
-                    userId = null;
-                    displayHistory([]);
+                // Geen gebruiker ingelogd, probeer in te loggen
+                try {
+                    if (initialAuthToken) {
+                        showLoading(true, "Bezig met inloggen...");
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        showLoading(true, "Bezig met anoniem inloggen...");
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Firebase Auth-fout:", error);
+                    showLoading(false); // Verberg de laadindicator bij een fout
+                    // toon een melding aan de gebruiker
+                    document.body.innerHTML += `<div class="card" style="margin-top:24px; color: var(--err);"><strong>Fout bij inloggen:</strong> ${error.message}</div>`;
                 }
             }
         });
 
         // Setup real-time listener for Firestore data
         function setupRealtimeListener() {
-            if (isAuthReady && userId) {
+            if (userId) {
                 const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/tests`);
                 const q = query(historyCollection);
                 onSnapshot(q, (snapshot) => {
@@ -358,12 +353,13 @@
 
         async function saveCurrentTest() {
             const pannetjeScore = computeAll();
-            if (pannetjeScore === null || !isAuthReady) {
-                alert('Beantwoord eerst alle vragen.');
+            if (pannetjeScore === null || !userId) {
+                // Gebruik geen 'alert', maar een aangepaste modale dialoog
+                showTemporaryMessage('Beantwoord eerst alle vragen.');
                 return;
             }
 
-            showLoading(true);
+            showLoading(true, "Test wordt opgeslagen...");
             try {
                 const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/tests`);
                 const now = new Date();
@@ -381,23 +377,44 @@
                 computeAll();
             } catch (error) {
                 console.error("Fout bij het opslaan van de test: ", error);
-                alert("Er is een fout opgetreden bij het opslaan van je test. Probeer het opnieuw.");
+                showTemporaryMessage("Er is een fout opgetreden bij het opslaan van je test. Probeer het opnieuw.", true);
             } finally {
                 showLoading(false);
             }
         }
 
+        function showTemporaryMessage(message, isError = false) {
+            const messageCard = document.createElement('div');
+            messageCard.className = 'card';
+            messageCard.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 10px 20px;
+                border-radius: 14px;
+                background-color: ${isError ? 'var(--err)' : 'var(--accent)'};
+                color: white;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 1000;
+                animation: fadeinout 4s forwards;
+            `;
+            messageCard.textContent = message;
+            document.body.appendChild(messageCard);
+
+            setTimeout(() => {
+                messageCard.remove();
+            }, 4000);
+        }
+
         function displayHistory(history) {
             const historyList = document.getElementById('history-list');
-            const noHistoryText = document.getElementById('no-history-text');
             const sortedHistory = history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
+            historyList.innerHTML = ''; // Maak de lijst leeg
             if (sortedHistory.length === 0) {
-                if (noHistoryText) noHistoryText.style.display = 'block';
                 historyList.innerHTML = `<p class="muted" id="no-history-text">Nog geen opgeslagen tests.</p>`;
             } else {
-                if (noHistoryText) noHistoryText.style.display = 'none';
-                historyList.innerHTML = '';
                 sortedHistory.forEach((entry) => {
                     const item = document.createElement('div');
                     item.className = 'history-item';
@@ -424,12 +441,12 @@
         }
 
         async function exportHistory() {
-            if (!isAuthReady) {
-                alert("Authenticatie is nog niet voltooid. Probeer het over een paar seconden opnieuw.");
+            if (!userId) {
+                showTemporaryMessage("Authenticatie is nog niet voltooid. Probeer het over een paar seconden opnieuw.");
                 return;
             }
 
-            showLoading(true);
+            showLoading(true, "Geschiedenis wordt geëxporteerd...");
             try {
                 const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/tests`);
                 const querySnapshot = await getDocs(query(historyCollection));
@@ -439,7 +456,7 @@
                 });
 
                 if (history.length === 0) {
-                    alert('Er is geen geschiedenis om te exporteren.');
+                    showTemporaryMessage('Er is geen geschiedenis om te exporteren.');
                     return;
                 }
 
@@ -467,35 +484,39 @@
                 URL.revokeObjectURL(link.href);
             } catch (error) {
                 console.error("Fout bij het exporteren van de geschiedenis: ", error);
-                alert("Er is een fout opgetreden bij het exporteren. Probeer het opnieuw.");
+                showTemporaryMessage("Er is een fout opgetreden bij het exporteren. Probeer het opnieuw.", true);
             } finally {
                 showLoading(false);
             }
         }
 
         async function resetAll() {
-            if (!isAuthReady) {
-                alert("Authenticatie is nog niet voltooid. Probeer het over een paar seconden opnieuw.");
+            if (!userId) {
+                showTemporaryMessage("Authenticatie is nog niet voltooid. Probeer het over een paar seconden opnieuw.");
                 return;
             }
 
-            showLoading(true);
-            try {
-                const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/tests`);
-                const querySnapshot = await getDocs(query(historyCollection));
-                const deletePromises = [];
-                querySnapshot.forEach((docRef) => {
-                    deletePromises.push(deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/tests`, docRef.id)));
-                });
-                await Promise.all(deletePromises);
+            // Aangepaste modale dialoog in plaats van confirm()
+            if (window.confirm("Weet u zeker dat u alle opgeslagen gegevens wilt wissen? Dit kan niet ongedaan worden gemaakt.")) {
+                showLoading(true, "Gegevens worden gewist...");
+                try {
+                    const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/tests`);
+                    const querySnapshot = await getDocs(query(historyCollection));
+                    const deletePromises = [];
+                    querySnapshot.forEach((docRef) => {
+                        deletePromises.push(deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/tests`, docRef.id)));
+                    });
+                    await Promise.all(deletePromises);
 
-                document.querySelectorAll('input').forEach(i => i.checked = false);
-                computeAll();
-            } catch (error) {
-                console.error("Fout bij het resetten van de gegevens: ", error);
-                alert("Er is een fout opgetreden bij het wissen van de gegevens. Probeer het opnieuw.");
-            } finally {
-                showLoading(false);
+                    document.querySelectorAll('input').forEach(i => i.checked = false);
+                    computeAll();
+                    showTemporaryMessage("Alle gegevens zijn succesvol gewist.");
+                } catch (error) {
+                    console.error("Fout bij het resetten van de gegevens: ", error);
+                    showTemporaryMessage("Er is een fout opgetreden bij het wissen van de gegevens. Probeer het opnieuw.", true);
+                } finally {
+                    showLoading(false);
+                }
             }
         }
         
