@@ -95,8 +95,7 @@
     <div class="wrap">
         <div class="card">
             <h1>Pannetjes – Zelftest</h1>
-            <p>Vul de vragen in. De score &ldquo;Pannetje&rdquo; wordt automatisch berekend op basis van je keuzes (zoals in je Excel). De data wordt veilig opgeslagen in een online database, zodat je deze op elk apparaat kunt bekijken en exporteren.</p>
-            <p class="note">Tip: op je telefoon kun je deze pagina aan je beginscherm toevoegen om hem als app te gebruiken.</p>
+            <p>Vul de vragen in. </p>
         </div>
 
         <form id="form" class="grid-2">
@@ -196,14 +195,7 @@
             </div>
         </section>
 
-        <div class="card">
-            <h2>Over de berekening</h2>
-            <ul class="note">
-                <li><strong>Q1 &amp; Q3</strong>: 1 keuze, score = gewicht van de gekozen optie (zoals je Excel de som van één keuze maakte).</li>
-                <li><strong>Q2</strong>: meerdere keuzes; score = gemiddelde van gewichten, naar boven afgerond (<em>ROUNDUP(AVERAGEIF(...))</em> in Excel).</li>
-                <li><strong>Q4</strong>: speciale logica: <code>s = som van gewichten</code>, <code>c = aantal keuzes</code>, <code>d = s - 2*c</code>. Daarna een mapping: <code>-2→1</code>, <code>-1→2</code>, <code>2→3</code>, <code>4→4</code>, <code>3→5</code>. Andere waarden worden gemeld als ongeldige combinatie (zoals Excel geen resultaat zou geven).</li>
-            </ul>
-        </div>
+        
     </div>
     
     <div id="loading-overlay" class="loading-overlay" style="display: none;">
