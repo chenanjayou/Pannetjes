@@ -3,32 +3,32 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Pannetjes – Zelftest</title>
+    <title>Pannetjes</title>
     <style>
         :root{
-            --bg:#f8fafc; --card:#ffffff; --muted:#64748b; --text:#1e293b; --accent:#2563eb; --accent-2:#3b82f6;
-            --ok:#16a34a; --warn:#f59e0b; --err:#dc2626;
+            --bg:#bdcef0; --card:#121a2b; --muted:#9aa4b2; --text:#eaf0ff; --accent:#6ea8fe; --accent-2:#9bdbff;
+            --ok:#30c48d; --warn:#ffb020; --err:#ff6b6b;
         }
         *{box-sizing:border-box}
         html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji"}
         a{color:var(--accent)}
         .wrap{max-width:860px;margin:24px auto;padding:16px}
-        .card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 6px 30px rgba(0,0,0,.1);margin-bottom:16px; border: 1px solid #e2e8f0;}
+        .card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 6px 30px rgba(0,0,0,.25);margin-bottom:16px}
         h1{font-size:1.6rem;margin:0 0 8px}
         h2{font-size:1.1rem;margin:0 0 8px}
         p{margin:0 0 8px;color:var(--muted)}
         .q{display:grid;gap:10px}
         .opts{display:grid;gap:8px;margin-top:4px}
-        .opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.03); border:1px solid rgba(0,0,0,.08);}
+        .opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);}
         .opt input{transform:translateY(2px);min-width:20px;min-height:20px}
         .foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:10px}
         .score{font-weight:600}
-        .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;background:rgba(0,0,0,.06);color:var(--muted);font-size:.9rem}
+        .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.06);color:var(--muted);font-size:.9rem}
         .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
         .result{display:grid;gap:10px}
         .big{font-size:2.3rem;font-weight:800;letter-spacing:.5px}
-        .btn{appearance:none;border:0;border-radius:14px;padding:10px 14px;background:var(--accent);color:#fff;font-weight:600}
-        .btn:hover{background:var(--accent-2);cursor:pointer}
+        .btn{appearance:none;border:0;border-radius:14px;padding:10px 14px;background:rgba(255,255,255,.1);color:var(--text);font-weight:600}
+        .btn:hover{background:rgba(255,255,255,.15);cursor:pointer}
         .note{color:var(--muted);font-size:.95rem}
         .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
         .grid-2{display:grid;gap:12px}
@@ -44,78 +44,18 @@
         .history-list {
             max-height: 200px;
             overflow-y: auto;
-            background: rgba(0, 0, 0, 0.03);
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 14px;
             padding: 10px;
         }
 
         .history-item {
             padding: 8px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .history-item:last-child {
             border-bottom: none;
-        }
-
-        /* Laadindicator */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--text);
-            z-index: 1000;
-            flex-direction: column;
-            gap: 1rem;
-            text-align: center;
-        }
-
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid var(--accent);
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Stijl voor aangepaste modal */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-        .modal-content {
-            background: var(--card);
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-            max-width: 400px;
-            text-align: center;
-        }
-        .modal-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 16px;
         }
     </style>
 </head>
@@ -123,7 +63,7 @@
     <div class="wrap">
         <div class="card">
             <h1>Pannetjes – Zelftest</h1>
-            <p>Vul de vragen in. </p>
+            <p>Vul de vragen in.</p>
         </div>
 
         <form id="form" class="grid-2">
@@ -186,7 +126,7 @@
                     <label class="opt"><input type="checkbox" name="q4" value="Slapen" data-weight="5"> Slapen</label>
                 </div>
                 <div class="foot"><span class="note">Meerdere keuzes toegestaan • Speciale weging zoals in Excel</span></div>
-                <p class="note muted" data-q4-hint style="display:none">Let op: De combinatie die je koos is niet geldig. Kies een geldige combinatie (bijv. <em>alleen Doorgaan</em>, <em>alleen Chillen</em>, <em>alleen Slapen</em>, <em>Chillen + Doorgaan</em>, of <em>Chillen + Slapen</em>).</p>
+                <p class="note muted" data-q4-hint style="display:none">Let op: De combinatie die je koos bestaat niet in het Excel-wegingsmodel. Pas je keuze aan (bijv. kies <em>Doorgaan</em>, of <em>Chillen + Doorgaan</em>, of <em>Slapen</em>, of <em>Chillen + Slapen</em>, of alle drie).</p>
             </section>
         </form>
 
@@ -208,7 +148,7 @@
                     <div class="big" id="pannetje">–</div>
                 </div>
             </div>
-            <p class="note">Berekening: <code>(Q1 + Q2 + Q3 + Q4) / 4</code>, afgerond naar boven voor het pannetje.</p>
+            
         </section>
 
         <!-- Nieuwe sectie voor geschiedenis en exporteren -->
@@ -217,99 +157,100 @@
                 <h2>Geschiedenis van zelftests</h2>
                 <button class="btn" id="export-history-btn">Exporteer naar Excel</button>
             </div>
+            <!-- Gebruikers-ID om te delen -->
+            <p id="userIdDisplay" class="note muted">Laden...</p>
             <!-- Lijst om de geschiedenis op te slaan -->
             <div id="history-list" class="history-list">
                 <p class="muted" id="no-history-text">Nog geen opgeslagen tests.</p>
             </div>
+            <div id="messageBox" style="display: none;" class="card warn"></div>
         </section>
     </div>
     
-    <div id="loading-overlay" class="loading-overlay" style="display: none;">
-        <div class="spinner"></div>
-        <p id="loading-text">Aan het laden...</p>
-    </div>
-
-    <!-- Modale dialoog voor bevestiging -->
-    <div id="confirmation-modal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <p id="modal-message"></p>
-            <div class="modal-buttons">
-                <button class="btn" id="modal-ok-btn">Ja</button>
-                <button class="btn" id="modal-cancel-btn">Annuleren</button>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
+        // Firebase SDK imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, addDoc, getDocs, onSnapshot, collection, query, orderBy, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Globale variabelen van de omgeving
+        // Globale variabelen van het Canvas-platform
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        let db, auth, userId;
-
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const loadingText = document.getElementById('loading-text');
-
-        const showLoading = (show, message = "Aan het laden...") => {
-            loadingText.textContent = message;
-            loadingOverlay.style.display = show ? 'flex' : 'none';
-        };
+        let db, auth, userId = null;
+        let isAuthReady = false;
 
         // Initialiseer Firebase
-        const app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-
-        // Zorg ervoor dat de app pas werkt als de authenticatiestatus bekend is
-        showLoading(true, "Authenticatie wordt gestart...");
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Gebruiker is succesvol ingelogd
-                userId = user.uid;
-                setupRealtimeListener();
-                showLoading(false);
-            } else {
-                // Geen gebruiker ingelogd, probeer in te loggen
-                try {
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
+        function initFirebase() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // Luister naar de authenticatiestatus
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
                     } else {
-                        await signInAnonymously(auth);
+                        userId = crypto.randomUUID();
                     }
-                    // De onAuthStateChanged-listener wordt nog een keer geactiveerd met de ingelogde gebruiker
-                } catch (error) {
-                    console.error("Firebase Auth-fout:", error);
-                    showLoading(false); // Verberg de laadindicator bij een fout
-                    showTemporaryMessage(`Inloggen mislukt: ${error.message}`, true);
-                }
-            }
-        });
+                    isAuthReady = true;
+                    
+                    // Toon gebruikers-ID in de UI
+                    const userIdDisplay = document.getElementById('userIdDisplay');
+                    userIdDisplay.textContent = `Je gebruikers-ID: ${userId}`;
 
-        // Setup real-time listener for Firestore data
-        function setupRealtimeListener() {
-            if (userId) {
-                const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/tests`);
-                const q = query(historyCollection);
-                onSnapshot(q, (snapshot) => {
-                    const history = [];
-                    snapshot.forEach(doc => {
-                        history.push(doc.data());
-                    });
-                    displayHistory(history);
-                }, (error) => {
-                    console.error("Firestore real-time listener failed: ", error);
+                    // Start het luisteren naar de geschiedenis zodra de gebruiker is geverifieerd
+                    displayHistory();
                 });
+                
+                // Meld de gebruiker aan met de aangepaste token als deze beschikbaar is
+                if (initialAuthToken) {
+                    signInWithCustomToken(auth, initialAuthToken).catch(err => {
+                        console.error("Aangepaste aanmelding mislukt: ", err);
+                        signInAnonymously(auth);
+                    });
+                } else {
+                    signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.error("Fout bij het initialiseren van Firebase: ", e);
+                showMessage('Fout bij het laden van de app. Controleer de console voor meer details.', 'err');
             }
         }
 
-        const q4Map = new Map([[-2, 1], [-1, 2], [1, 3], [2, 3], [4, 4], [3, 5]]);
+        // De Excel-weging voor vraag 4, nu gebaseerd op de geselecteerde gewichten
+        const q4Map = new Map([
+            ["0", 1],          
+            ["3", 3],          
+            ["5", 5],          
+            ["0,3", 2],        
+            ["0,5", 5],        
+            ["3,5", 4],        
+            ["0,3,5", 3],      
+        ]);
 
+        /**
+         * Toont een tijdelijk bericht op het scherm
+         * @param {string} message Het te tonen bericht
+         * @param {string} type Het type bericht ('ok', 'warn', 'err')
+         */
+        function showMessage(message, type = 'warn') {
+            const box = document.getElementById('messageBox');
+            box.textContent = message;
+            box.className = `card ${type}`;
+            box.style.display = 'block';
+            setTimeout(() => {
+                box.style.display = 'none';
+            }, 4000);
+        }
+
+        /**
+         * Berekent de score voor een individuele vraagsectie.
+         * @param {HTMLElement} section De vraagsectie
+         * @returns {number|null} De berekende score of null als er geen antwoord is.
+         */
         function computeQuestion(section) {
             const type = section.dataset.type;
             const inputs = [...section.querySelectorAll('input')];
@@ -325,15 +266,13 @@
                 else score = Math.ceil(weights.reduce((a, b) => a + b, 0) / weights.length);
             } else if (type === 'special-q4') {
                 const hint = section.querySelector('[data-q4-hint]');
-                if (weights.length === 0) {
+                if (sel.length === 0) {
                     score = null;
                     hint.style.display = 'none';
                 } else {
-                    const s = weights.reduce((a, b) => a + b, 0);
-                    const c = weights.length;
-                    const d = s - 2 * c;
-                    if (q4Map.has(d)) {
-                        score = q4Map.get(d);
+                    const sortedWeights = weights.sort((a, b) => a - b).join(',');
+                    if (q4Map.has(sortedWeights)) {
+                        score = q4Map.get(sortedWeights);
                         hint.style.display = 'none';
                     } else {
                         score = null;
@@ -345,6 +284,10 @@
             return score;
         }
 
+        /**
+         * Berekent de totale score en de "Pannetje"-score.
+         * @returns {number|null} De berekende Pannetje-score of null.
+         */
         function computeAll() {
             const sections = [...document.querySelectorAll('section.q')];
             const scores = sections.map(computeQuestion);
@@ -368,6 +311,10 @@
             return pannetje;
         }
 
+        /**
+         * Haalt de huidige geselecteerde antwoorden op uit het formulier, inclusief de vraagtekst.
+         * @returns {object} Een object met de antwoorden.
+         */
         function getAnswers() {
             const answers = {};
             const qSections = document.querySelectorAll('section.q');
@@ -386,120 +333,123 @@
             return answers;
         }
 
+        /**
+         * Slaat de huidige test met score, datum en tijd op in Firestore.
+         */
         async function saveCurrentTest() {
+            if (!isAuthReady) {
+                showMessage('Authenticatie nog niet voltooid. Probeer het over een moment opnieuw.', 'warn');
+                return;
+            }
+
             const pannetjeScore = computeAll();
-            if (pannetjeScore === null || !userId) {
-                showTemporaryMessage('Beantwoord eerst alle vragen.');
+            if (pannetjeScore === null) {
+                showMessage('Vul alle vragen in om op te slaan.', 'err');
                 return;
             }
+            
+            const now = new Date();
+            const newEntry = {
+                timestamp: now.toISOString(),
+                answers: getAnswers(),
+                score: pannetjeScore,
+                userId: userId // Voeg userId toe voor de beveiligingsregels
+            };
 
-            showLoading(true, "Test wordt opgeslagen...");
             try {
-                const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/tests`);
-                const now = new Date();
-                const newEntry = {
-                    timestamp: now.toISOString(),
-                    date: now.toLocaleDateString('nl-NL'),
-                    time: now.toLocaleTimeString('nl-NL'),
-                    answers: getAnswers(),
-                    score: pannetjeScore
-                };
+                const historyCollection = collection(db, `artifacts/${appId}/public/data/pannetjes_history`);
                 await addDoc(historyCollection, newEntry);
-
+                showMessage('Test succesvol opgeslagen!', 'ok');
+                
+                // Wis de selecties na het opslaan
                 document.querySelectorAll('input').forEach(i => i.checked = false);
-                computeAll();
-            } catch (error) {
-                console.error("Fout bij het opslaan van de test: ", error);
-                showTemporaryMessage("Er is een fout opgetreden bij het opslaan van je test. Probeer het opnieuw.", true);
-            } finally {
-                showLoading(false);
+            } catch (e) {
+                console.error("Fout bij het toevoegen van document: ", e);
+                showMessage('Fout bij het opslaan van de test.', 'err');
             }
         }
 
-        function showTemporaryMessage(message, isError = false) {
-            const messageCard = document.createElement('div');
-            messageCard.className = 'card';
-            messageCard.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                padding: 10px 20px;
-                border-radius: 14px;
-                background-color: ${isError ? 'var(--err)' : 'var(--accent)'};
-                color: white;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                z-index: 1000;
-                animation: fadeinout 4s forwards;
-            `;
-            messageCard.textContent = message;
-            document.body.appendChild(messageCard);
+        /**
+         * Toont de opgeslagen geschiedenis in de UI via een real-time listener.
+         */
+        function displayHistory() {
+            if (!isAuthReady) return;
 
-            setTimeout(() => {
-                messageCard.remove();
-            }, 4000);
-        }
-
-        function displayHistory(history) {
             const historyList = document.getElementById('history-list');
-            const sortedHistory = history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-            historyList.innerHTML = '';
-            if (sortedHistory.length === 0) {
-                historyList.innerHTML = `<p class="muted" id="no-history-text">Nog geen opgeslagen tests.</p>`;
-            } else {
-                sortedHistory.forEach((entry) => {
-                    const item = document.createElement('div');
-                    item.className = 'history-item';
-                    const answersText = Object.keys(entry.answers).map(qid => {
-                        const answer = entry.answers[qid].selected.join(' & ');
-                        return answer ? `<strong>${qid.toUpperCase()}:</strong> ${answer}` : null;
-                    }).filter(Boolean).join(' | ');
-
-                    item.innerHTML = `
-                        <div class="row">
-                            <span class="muted">${entry.date} ${entry.time}</span>
-                            <span class="badge">
-                                <span>Pannetje:</span>
-                                <strong>${entry.score}</strong>
-                            </span>
-                        </div>
-                        <div class="note mt-1">
-                            ${answersText}
-                        </div>
-                    `;
-                    historyList.appendChild(item);
-                });
-            }
-        }
-
-        async function exportHistory() {
-            if (!userId) {
-                showTemporaryMessage("Authenticatie is nog niet voltooid. Probeer het over een paar seconden opnieuw.");
-                return;
-            }
-
-            showLoading(true, "Geschiedenis wordt geëxporteerd...");
-            try {
-                const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/tests`);
-                const querySnapshot = await getDocs(query(historyCollection));
+            const noHistoryText = document.getElementById('no-history-text');
+            
+            const historyCollectionRef = collection(db, `artifacts/${appId}/public/data/pannetjes_history`);
+            const q = query(historyCollectionRef, orderBy("timestamp", "desc"));
+            
+            onSnapshot(q, (querySnapshot) => {
                 const history = [];
-                querySnapshot.forEach(doc => {
+                querySnapshot.forEach((doc) => {
                     history.push(doc.data());
                 });
 
                 if (history.length === 0) {
-                    showTemporaryMessage('Er is geen geschiedenis om te exporteren.');
+                    if (noHistoryText) noHistoryText.style.display = 'block';
+                    historyList.innerHTML = `<p class="muted" id="no-history-text">Nog geen opgeslagen tests.</p>`;
+                } else {
+                    if (noHistoryText) noHistoryText.style.display = 'none';
+                    historyList.innerHTML = '';
+                    history.forEach((entry) => {
+                        const date = new Date(entry.timestamp);
+                        const item = document.createElement('div');
+                        item.className = 'history-item';
+                        const answersText = Object.keys(entry.answers).map(qid => {
+                            const answer = entry.answers[qid].selected.join(' & ');
+                            return answer ? `<strong>${qid.toUpperCase()}:</strong> ${answer}` : null;
+                        }).filter(Boolean).join(' | ');
+
+                        item.innerHTML = `
+                            <div class="row">
+                                <span class="muted">${date.toLocaleDateString('nl-NL')} ${date.toLocaleTimeString('nl-NL')}</span>
+                                <span class="badge">
+                                    <span>Pannetje:</span>
+                                    <strong>${entry.score}</strong>
+                                </span>
+                            </div>
+                            <div class="note mt-1">
+                                ${answersText}
+                            </div>
+                        `;
+                        historyList.appendChild(item);
+                    });
+                }
+            }, (error) => {
+                console.error("Fout in snapshot listener:", error);
+                // Deze fout is nu te verwachten totdat de auth klaar is, dus we tonen geen melding.
+            });
+        }
+        
+        /**
+         * Exporteert de geschiedenis naar een CSV-bestand met aparte kolommen.
+         */
+        async function exportHistory() {
+            if (!isAuthReady) {
+                showMessage('Authenticatie nog niet voltooid. Probeer het over een moment opnieuw.', 'warn');
+                return;
+            }
+
+            try {
+                const historyCollectionRef = collection(db, `artifacts/${appId}/public/data/pannetjes_history`);
+                const querySnapshot = await getDocs(historyCollectionRef);
+                const history = querySnapshot.docs.map(doc => doc.data());
+                
+                if (history.length === 0) {
+                    showMessage('Er is geen geschiedenis om te exporteren.', 'warn');
                     return;
                 }
-
+            
                 const headers = ["Datum", "Tijd", "Pannetje Score", "Q1 Gevoel", "Q2 Lichamelijke sensaties", "Q3 Gedachtes", "Q4 Neiging om te doen"];
                 let csvContent = headers.map(h => `"${h}"`).join(";") + "\n";
-
+            
                 history.forEach(entry => {
+                    const date = new Date(entry.timestamp);
                     const row = [
-                        `"${entry.date}"`,
-                        `"${entry.time}"`,
+                        `"${date.toLocaleDateString('nl-NL')}"`,
+                        `"${date.toLocaleTimeString('nl-NL')}"`,
                         `"${entry.score}"`,
                         `"${entry.answers['q1'].selected.join(', ')}"`,
                         `"${entry.answers['q2'].selected.join(', ')}"`,
@@ -508,86 +458,55 @@
                     ];
                     csvContent += row.join(";") + "\n";
                 });
-
+            
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = 'pannetjes_geschiedenis.csv';
                 link.click();
                 URL.revokeObjectURL(link.href);
-            } catch (error) {
-                console.error("Fout bij het exporteren van de geschiedenis: ", error);
-                showTemporaryMessage("Er is een fout opgetreden bij het exporteren. Probeer het opnieuw.", true);
-            } finally {
-                showLoading(false);
+            } catch (e) {
+                console.error("Fout bij het exporteren van geschiedenis: ", e);
+                showMessage('Fout bij het exporteren. Probeer het opnieuw.', 'err');
             }
         }
-        
-        // Aangepaste modale dialoog in plaats van confirm()
-        function showConfirmationDialog(message) {
-            return new Promise((resolve) => {
-                const modal = document.getElementById('confirmation-modal');
-                const modalMessage = document.getElementById('modal-message');
-                const okBtn = document.getElementById('modal-ok-btn');
-                const cancelBtn = document.getElementById('modal-cancel-btn');
 
-                modalMessage.textContent = message;
-                modal.style.display = 'flex';
-
-                const handleOk = () => {
-                    modal.style.display = 'none';
-                    okBtn.removeEventListener('click', handleOk);
-                    cancelBtn.removeEventListener('click', handleCancel);
-                    resolve(true);
-                };
-
-                const handleCancel = () => {
-                    modal.style.display = 'none';
-                    okBtn.removeEventListener('click', handleOk);
-                    cancelBtn.removeEventListener('click', handleCancel);
-                    resolve(false);
-                };
-
-                okBtn.addEventListener('click', handleOk);
-                cancelBtn.addEventListener('click', handleCancel);
-            });
-        }
-
-        async function resetAll() {
-            if (!userId) {
-                showTemporaryMessage("Authenticatie is nog niet voltooid. Probeer het over een paar seconden opnieuw.");
+        /**
+         * Verwijdert alle tests uit de database.
+         */
+        async function clearAllTests() {
+            if (!isAuthReady) {
+                showMessage('Authenticatie nog niet voltooid. Probeer het over een moment opnieuw.', 'warn');
                 return;
             }
+            
+            try {
+                const historyCollectionRef = collection(db, `artifacts/${appId}/public/data/pannetjes_history`);
+                const querySnapshot = await getDocs(historyCollectionRef);
+                
+                const batch = writeBatch(db);
+                querySnapshot.docs.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
 
-            const isConfirmed = await showConfirmationDialog("Weet u zeker dat u alle opgeslagen gegevens wilt wissen? Dit kan niet ongedaan worden gemaakt.");
-
-            if (isConfirmed) {
-                showLoading(true, "Gegevens worden gewist...");
-                try {
-                    const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/tests`);
-                    const querySnapshot = await getDocs(query(historyCollection));
-                    const deletePromises = [];
-                    querySnapshot.forEach((docRef) => {
-                        deletePromises.push(deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/tests`, docRef.id)));
-                    });
-                    await Promise.all(deletePromises);
-
-                    document.querySelectorAll('input').forEach(i => i.checked = false);
-                    computeAll();
-                    showTemporaryMessage("Alle gegevens zijn succesvol gewist.");
-                } catch (error) {
-                    console.error("Fout bij het resetten van de gegevens: ", error);
-                    showTemporaryMessage("Er is een fout opgetreden bij het wissen van de gegevens. Probeer het opnieuw.", true);
-                } finally {
-                    showLoading(false);
-                }
+                // Wis de selecties en de scores in de UI
+                document.querySelectorAll('input').forEach(i => i.checked = false);
+                computeAll();
+            } catch (e) {
+                console.error("Fout bij het wissen van gegevens: ", e);
+                showMessage('Fout bij het wissen van de geschiedenis.', 'err');
             }
         }
-        
+
+        // Event listeners
         document.getElementById('form').addEventListener('change', computeAll);
         document.getElementById('save-btn').addEventListener('click', saveCurrentTest);
-        document.getElementById('reset').addEventListener('click', resetAll);
+        document.getElementById('reset').addEventListener('click', clearAllTests);
         document.getElementById('export-history-btn').addEventListener('click', exportHistory);
+        
+        // Start de app
+        initFirebase();
     </script>
 </body>
 </html>
