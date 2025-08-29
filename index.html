@@ -6,7 +6,7 @@
     <title>Pannetjes – Zelftest</title>
     <style>
         :root{
-            --bg:#bdcef0; --card:#121a2b; --muted:#9aa4b2; --text:#eaf0ff; --accent:#6ea8fe; --accent-2:#9bdbff;
+            --bg:#0b1220; --card:#121a2b; --muted:#9aa4b2; --text:#eaf0ff; --accent:#6ea8fe; --accent-2:#9bdbff;
             --ok:#30c48d; --warn:#ffb020; --err:#ff6b6b;
         }
         *{box-sizing:border-box}
@@ -158,7 +158,7 @@
                     <label class="opt"><input type="checkbox" name="q4" value="Slapen" data-weight="5"> Slapen</label>
                 </div>
                 <div class="foot"><span class="note">Meerdere keuzes toegestaan • Speciale weging zoals in Excel</span></div>
-                <p class="note muted" data-q4-hint style="display:none">Let op: De combinatie die je koos bestaat niet in het Excel-wegingsmodel. Pas je keuze aan (bijv. kies <em>Doorgaan</em>, of <em>Chillen + Doorgaan</em>, of <em>Slapen</em>, of <em>Chillen + Slapen</em>, of alle drie).</p>
+                <p class="note muted" data-q4-hint style="display:none">Let op: De combinatie die je koos is niet geldig. Kies een geldige combinatie (bijv. <em>alleen Doorgaan</em>, <em>alleen Chillen</em>, <em>alleen Slapen</em>, <em>Chillen + Doorgaan</em>, of <em>Chillen + Slapen</em>).</p>
             </section>
         </form>
 
@@ -263,7 +263,7 @@
             }
         }
 
-        const q4Map = new Map([[-2, 1], [-1, 2], [2, 3], [4, 4], [3, 5]]);
+        const q4Map = new Map([[-2, 1], [-1, 2], [1, 3], [2, 3], [4, 4], [3, 5]]);
 
         function computeQuestion(section) {
             const type = section.dataset.type;
