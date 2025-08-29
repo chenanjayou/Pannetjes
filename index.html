@@ -29,7 +29,6 @@
         .big{font-size:2.3rem;font-weight:800;letter-spacing:.5px}
         .btn{appearance:none;border:0;border-radius:14px;padding:10px 14px;background:rgba(255,255,255,.1);color:var(--text);font-weight:600}
         .btn:hover{background:rgba(255,255,255,.15);cursor:pointer}
-        .btn:disabled, .btn:disabled:hover { background: rgba(255,255,255,0.05); color: var(--muted); cursor: not-allowed; }
         .note{color:var(--muted);font-size:.95rem}
         .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
         .grid-2{display:grid;gap:12px}
@@ -135,8 +134,8 @@
             <div class="row">
                 <h2>Uitkomst</h2>
                 <div class="flex gap-2">
-                    <button class="btn" id="save-btn" type="button" disabled>Test opslaan</button>
-                    <button class="btn" id="reset" type="button" disabled>Alles wissen</button>
+                    <button class="btn" id="save-btn" type="button">Test opslaan</button>
+                    <button class="btn" id="reset" type="button">Alles wissen</button>
                 </div>
             </div>
             <div class="row">
@@ -149,106 +148,32 @@
                     <div class="big" id="pannetje">–</div>
                 </div>
             </div>
-            
+           
         </section>
 
         <!-- Nieuwe sectie voor geschiedenis en exporteren -->
         <section class="card history-section">
             <div class="row">
                 <h2>Geschiedenis van zelftests</h2>
-                <button class="btn" id="export-history-btn" disabled>Exporteer naar Excel</button>
+                <button class="btn" id="export-history-btn">Exporteer naar Excel</button>
             </div>
-            <!-- Gebruikers-ID om te delen -->
-            <p id="userIdDisplay" class="note muted">Laden...</p>
             <!-- Lijst om de geschiedenis op te slaan -->
             <div id="history-list" class="history-list">
                 <p class="muted" id="no-history-text">Nog geen opgeslagen tests.</p>
             </div>
-            <div id="messageBox" style="display: none;" class="card warn"></div>
         </section>
-    </div>
-    
-    <script type="module">
-        // Firebase SDK imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, addDoc, getDocs, onSnapshot, collection, query, orderBy, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         
-        // Globale variabelen van het Canvas-platform
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let db, auth, userId = null;
-        let isAuthReady = false;
-
-        // Initialiseer Firebase
-        function initFirebase() {
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
-                // Luister naar de authenticatiestatus
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                    } else {
-                        userId = crypto.randomUUID();
-                    }
-                    isAuthReady = true;
-                    
-                    // Toon gebruikers-ID in de UI
-                    const userIdDisplay = document.getElementById('userIdDisplay');
-                    userIdDisplay.textContent = `Je gebruikers-ID: ${userId}`;
-
-                    // Activeer de knoppen zodra de authenticatie klaar is
-                    enableButtons();
-
-                    // Start het luisteren naar de geschiedenis zodra de gebruiker is geverifieerd
-                    displayHistory();
-                });
-                
-                // Meld de gebruiker aan met de aangepaste token als deze beschikbaar is
-                if (initialAuthToken) {
-                    signInWithCustomToken(auth, initialAuthToken).catch(err => {
-                        console.error("Aangepaste aanmelding mislukt: ", err);
-                        signInAnonymously(auth);
-                    });
-                } else {
-                    signInAnonymously(auth);
-                }
-            } catch (e) {
-                console.error("Fout bij het initialiseren van Firebase: ", e);
-                showMessage('Fout bij het laden van de app. Controleer de console voor meer details.', 'err');
-            }
-        }
-
-        // De Excel-weging voor vraag 4, nu gebaseerd op de geselecteerde gewichten
+    <script>
         const q4Map = new Map([
-            ["0", 1],          
-            ["3", 3],          
-            ["5", 5],          
-            ["0,3", 2],        
-            ["0,5", 5],        
-            ["3,5", 4],        
-            ["0,3,5", 3],      
+            [-2, 1],
+            [-1, 2],
+            [2, 3],
+            [4, 4],
+            [3, 5],
+            // Nieuwe toevoeging voor "alleen Chillen"
+            [1, 3]
         ]);
-
-        /**
-         * Toont een tijdelijk bericht op het scherm
-         * @param {string} message Het te tonen bericht
-         * @param {string} type Het type bericht ('ok', 'warn', 'err')
-         */
-        function showMessage(message, type = 'warn') {
-            const box = document.getElementById('messageBox');
-            box.textContent = message;
-            box.className = `card ${type}`;
-            box.style.display = 'block';
-            setTimeout(() => {
-                box.style.display = 'none';
-            }, 4000);
-        }
 
         /**
          * Berekent de score voor een individuele vraagsectie.
@@ -270,13 +195,15 @@
                 else score = Math.ceil(weights.reduce((a, b) => a + b, 0) / weights.length);
             } else if (type === 'special-q4') {
                 const hint = section.querySelector('[data-q4-hint]');
-                if (sel.length === 0) {
+                if (weights.length === 0) {
                     score = null;
                     hint.style.display = 'none';
                 } else {
-                    const sortedWeights = weights.sort((a, b) => a - b).join(',');
-                    if (q4Map.has(sortedWeights)) {
-                        score = q4Map.get(sortedWeights);
+                    const s = weights.reduce((a, b) => a + b, 0);
+                    const c = weights.length;
+                    const d = s - 2 * c;
+                    if (q4Map.has(d)) {
+                        score = q4Map.get(d);
                         hint.style.display = 'none';
                     } else {
                         score = null;
@@ -338,188 +265,114 @@
         }
 
         /**
-         * Slaat de huidige test met score, datum en tijd op in Firestore.
+         * Slaat de huidige test met score, datum en tijd op in localStorage.
          */
-        async function saveCurrentTest() {
-            if (!isAuthReady) {
-                showMessage('Authenticatie nog niet voltooid. Probeer het over een moment opnieuw.', 'warn');
-                return;
-            }
-
+        function saveCurrentTest() {
             const pannetjeScore = computeAll();
-            if (pannetjeScore === null) {
-                showMessage('Vul alle vragen in om op te slaan.', 'err');
-                return;
-            }
-            
-            const now = new Date();
-            const newEntry = {
-                timestamp: now.toISOString(),
-                answers: getAnswers(),
-                score: pannetjeScore,
-                userId: userId // Voeg userId toe voor de beveiligingsregels
-            };
+            // Sla alleen op als alle vragen zijn beantwoord
+            if (pannetjeScore !== null) {
+                const history = JSON.parse(localStorage.getItem('pannetjesHistory') || '[]');
+                const now = new Date();
+                const newEntry = {
+                    timestamp: now.toISOString(),
+                    date: now.toLocaleDateString('nl-NL'),
+                    time: now.toLocaleTimeString('nl-NL'),
+                    answers: getAnswers(),
+                    score: pannetjeScore
+                };
+                history.unshift(newEntry);
+                localStorage.setItem('pannetjesHistory', JSON.stringify(history));
+                displayHistory();
 
-            try {
-                const historyCollection = collection(db, `artifacts/${appId}/public/data/pannetjes_history`);
-                await addDoc(historyCollection, newEntry);
-                showMessage('Test succesvol opgeslagen!', 'ok');
-                
-                // Wis de selecties na het opslaan
+                // Verwijder alle selecties na het opslaan
                 document.querySelectorAll('input').forEach(i => i.checked = false);
-            } catch (e) {
-                console.error("Fout bij het toevoegen van document: ", e);
-                showMessage('Fout bij het opslaan van de test.', 'err');
             }
         }
 
         /**
-         * Toont de opgeslagen geschiedenis in de UI via een real-time listener.
+         * Toont de opgeslagen geschiedenis in de UI.
          */
         function displayHistory() {
-            if (!isAuthReady) return;
-
             const historyList = document.getElementById('history-list');
             const noHistoryText = document.getElementById('no-history-text');
-            
-            const historyCollectionRef = collection(db, `artifacts/${appId}/public/data/pannetjes_history`);
-            const q = query(historyCollectionRef, orderBy("timestamp", "desc"));
-            
-            onSnapshot(q, (querySnapshot) => {
-                const history = [];
-                querySnapshot.forEach((doc) => {
-                    history.push(doc.data());
+            const history = JSON.parse(localStorage.getItem('pannetjesHistory') || '[]').sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            if (history.length === 0) {
+                if (noHistoryText) noHistoryText.style.display = 'block';
+                historyList.innerHTML = `<p class="muted" id="no-history-text">Nog geen opgeslagen tests.</p>`;
+            } else {
+                if (noHistoryText) noHistoryText.style.display = 'none';
+                historyList.innerHTML = '';
+                history.forEach((entry) => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    const answersText = Object.keys(entry.answers).map(qid => {
+                        const answer = entry.answers[qid].selected.join(' & ');
+                        return answer ? `<strong>${qid.toUpperCase()}:</strong> ${answer}` : null;
+                    }).filter(Boolean).join(' | ');
+
+                    item.innerHTML = `
+                        <div class="row">
+                            <span class="muted">${entry.date} ${entry.time}</span>
+                            <span class="badge">
+                                <span>Pannetje:</span>
+                                <strong>${entry.score}</strong>
+                            </span>
+                        </div>
+                        <div class="note mt-1">
+                            ${answersText}
+                        </div>
+                    `;
+                    historyList.appendChild(item);
                 });
-
-                if (history.length === 0) {
-                    if (noHistoryText) noHistoryText.style.display = 'block';
-                    historyList.innerHTML = `<p class="muted" id="no-history-text">Nog geen opgeslagen tests.</p>`;
-                } else {
-                    if (noHistoryText) noHistoryText.style.display = 'none';
-                    historyList.innerHTML = '';
-                    history.forEach((entry) => {
-                        const date = new Date(entry.timestamp);
-                        const item = document.createElement('div');
-                        item.className = 'history-item';
-                        const answersText = Object.keys(entry.answers).map(qid => {
-                            const answer = entry.answers[qid].selected.join(' & ');
-                            return answer ? `<strong>${qid.toUpperCase()}:</strong> ${answer}` : null;
-                        }).filter(Boolean).join(' | ');
-
-                        item.innerHTML = `
-                            <div class="row">
-                                <span class="muted">${date.toLocaleDateString('nl-NL')} ${date.toLocaleTimeString('nl-NL')}</span>
-                                <span class="badge">
-                                    <span>Pannetje:</span>
-                                    <strong>${entry.score}</strong>
-                                </span>
-                            </div>
-                            <div class="note mt-1">
-                                ${answersText}
-                            </div>
-                        `;
-                        historyList.appendChild(item);
-                    });
-                }
-            }, (error) => {
-                console.error("Fout in snapshot listener:", error);
-                // Deze fout is nu te verwachten totdat de auth klaar is, dus we tonen geen melding.
-            });
+            }
         }
-        
+
         /**
          * Exporteert de geschiedenis naar een CSV-bestand met aparte kolommen.
          */
-        async function exportHistory() {
-            if (!isAuthReady) {
-                showMessage('Authenticatie nog niet voltooid. Probeer het over een moment opnieuw.', 'warn');
+        function exportHistory() {
+            const history = JSON.parse(localStorage.getItem('pannetjesHistory') || '[]');
+            if (history.length === 0) {
+                alert('Er is geen geschiedenis om te exporteren.');
                 return;
             }
 
-            try {
-                const historyCollectionRef = collection(db, `artifacts/${appId}/public/data/pannetjes_history`);
-                const querySnapshot = await getDocs(historyCollectionRef);
-                const history = querySnapshot.docs.map(doc => doc.data());
-                
-                if (history.length === 0) {
-                    showMessage('Er is geen geschiedenis om te exporteren.', 'warn');
-                    return;
-                }
-            
-                const headers = ["Datum", "Tijd", "Pannetje Score", "Q1 Gevoel", "Q2 Lichamelijke sensaties", "Q3 Gedachtes", "Q4 Neiging om te doen"];
-                let csvContent = headers.map(h => `"${h}"`).join(";") + "\n";
-            
-                history.forEach(entry => {
-                    const date = new Date(entry.timestamp);
-                    const row = [
-                        `"${date.toLocaleDateString('nl-NL')}"`,
-                        `"${date.toLocaleTimeString('nl-NL')}"`,
-                        `"${entry.score}"`,
-                        `"${entry.answers['q1'].selected.join(', ')}"`,
-                        `"${entry.answers['q2'].selected.join(', ')}"`,
-                        `"${entry.answers['q3'].selected.join(', ')}"`,
-                        `"${entry.answers['q4'].selected.join(', ')}"`
-                    ];
-                    csvContent += row.join(";") + "\n";
-                });
-            
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = 'pannetjes_geschiedenis.csv';
-                link.click();
-                URL.revokeObjectURL(link.href);
-            } catch (e) {
-                console.error("Fout bij het exporteren van geschiedenis: ", e);
-                showMessage('Fout bij het exporteren. Probeer het opnieuw.', 'err');
-            }
+            const headers = ["Datum", "Tijd", "Pannetje Score", "Q1 Gevoel", "Q2 Lichamelijke sensaties", "Q3 Gedachtes", "Q4 Neiging om te doen"];
+            let csvContent = headers.map(h => `"${h}"`).join(";") + "\n";
+
+            history.forEach(entry => {
+                const row = [
+                    `"${entry.date}"`,
+                    `"${entry.time}"`,
+                    `"${entry.score}"`,
+                    `"${entry.answers['q1'].selected.join(', ')}"`,
+                    `"${entry.answers['q2'].selected.join(', ')}"`,
+                    `"${entry.answers['q3'].selected.join(', ')}"`,
+                    `"${entry.answers['q4'].selected.join(', ')}"`
+                ];
+                csvContent += row.join(";") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'pannetjes_geschiedenis.csv';
+            link.click();
+            URL.revokeObjectURL(link.href);
         }
 
-        /**
-         * Verwijdert alle tests uit de database.
-         */
-        async function clearAllTests() {
-            if (!isAuthReady) {
-                showMessage('Authenticatie nog niet voltooid. Probeer het over een moment opnieuw.', 'warn');
-                return;
-            }
-            
-            try {
-                const historyCollectionRef = collection(db, `artifacts/${appId}/public/data/pannetjes_history`);
-                const querySnapshot = await getDocs(historyCollectionRef);
-                
-                const batch = writeBatch(db);
-                querySnapshot.docs.forEach(doc => {
-                    batch.delete(doc.ref);
-                });
-                await batch.commit();
-
-                // Wis de selecties en de scores in de UI
-                document.querySelectorAll('input').forEach(i => i.checked = false);
-                computeAll();
-            } catch (e) {
-                console.error("Fout bij het wissen van gegevens: ", e);
-                showMessage('Fout bij het wissen van de geschiedenis.', 'err');
-            }
-        }
-
-        /**
-         * Activeert de knoppen zodra de Firebase-authenticatie is voltooid.
-         */
-        function enableButtons() {
-            document.getElementById('save-btn').disabled = false;
-            document.getElementById('reset').disabled = false;
-            document.getElementById('export-history-btn').disabled = false;
-        }
-
-        // Event listeners
         document.getElementById('form').addEventListener('change', computeAll);
         document.getElementById('save-btn').addEventListener('click', saveCurrentTest);
-        document.getElementById('reset').addEventListener('click', clearAllTests);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.querySelectorAll('input').forEach(i => i.checked = false);
+            localStorage.removeItem('pannetjesHistory');
+            computeAll();
+            displayHistory();
+        });
         document.getElementById('export-history-btn').addEventListener('click', exportHistory);
-        
-        // Start de app
-        initFirebase();
+
+        displayHistory();
     </script>
 </body>
 </html>
