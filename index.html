@@ -251,7 +251,6 @@
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let db, auth, userId;
-        let isInitialAuthComplete = false;
 
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingText = document.getElementById('loading-text');
@@ -270,12 +269,6 @@
         showLoading(true, "Authenticatie wordt gestart...");
 
         onAuthStateChanged(auth, async (user) => {
-            // Voer de initialisatielogica slechts één keer uit
-            if (isInitialAuthComplete) {
-                return;
-            }
-            isInitialAuthComplete = true;
-
             if (user) {
                 // Gebruiker is succesvol ingelogd
                 userId = user.uid;
@@ -284,13 +277,10 @@
             } else {
                 // Geen gebruiker ingelogd, probeer in te loggen
                 try {
-                    console.log("Geen gebruiker gevonden, probeer in te loggen...");
                     if (initialAuthToken) {
                         await signInWithCustomToken(auth, initialAuthToken);
-                        console.log("Inloggen met custom token geslaagd.");
                     } else {
                         await signInAnonymously(auth);
-                        console.log("Anoniem inloggen geslaagd.");
                     }
                     // De onAuthStateChanged-listener wordt nog een keer geactiveerd met de ingelogde gebruiker
                 } catch (error) {
@@ -304,7 +294,6 @@
         // Setup real-time listener for Firestore data
         function setupRealtimeListener() {
             if (userId) {
-                console.log(`Setting up listener for user: ${userId}`);
                 const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/tests`);
                 const q = query(historyCollection);
                 onSnapshot(q, (snapshot) => {
