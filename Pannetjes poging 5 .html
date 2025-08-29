@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pannetjes</title>
+    <style>
+        :root{
+            --bg:#bdcef0; --card:#121a2b; --muted:#9aa4b2; --text:#eaf0ff; --accent:#6ea8fe; --accent-2:#9bdbff;
+            --ok:#30c48d; --warn:#ffb020; --err:#ff6b6b;
+        }
+        *{box-sizing:border-box}
+        html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji"}
+        a{color:var(--accent)}
+        .wrap{max-width:860px;margin:24px auto;padding:16px}
+        .card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 6px 30px rgba(0,0,0,.25);margin-bottom:16px}
+        h1{font-size:1.6rem;margin:0 0 8px}
+        h2{font-size:1.1rem;margin:0 0 8px}
+        p{margin:0 0 8px;color:var(--muted)}
+        .q{display:grid;gap:10px}
+        .opts{display:grid;gap:8px;margin-top:4px}
+        .opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);}
+        .opt input{transform:translateY(2px);min-width:20px;min-height:20px}
+        .foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:10px}
+        .score{font-weight:600}
+        .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.06);color:var(--muted);font-size:.9rem}
+        .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+        .result{display:grid;gap:10px}
+        .big{font-size:2.3rem;font-weight:800;letter-spacing:.5px}
+        .btn{appearance:none;border:0;border-radius:14px;padding:10px 14px;background:rgba(255,255,255,.1);color:var(--text);font-weight:600}
+        .btn:hover{background:rgba(255,255,255,.15);cursor:pointer}
+        .note{color:var(--muted);font-size:.95rem}
+        .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
+        .grid-2{display:grid;gap:12px}
+        @media(min-width:720px){ .grid-2{grid-template-columns:1fr 1fr} }
+        .muted{color:var(--muted)}
+
+        /* Stijl voor de geschiedenissectie */
+        .history-section {
+            display: grid;
+            gap: 10px;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 14px;
+            padding: 10px;
+        }
+
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="card">
+            <h1>Pannetjes – Zelftest</h1>
+            <p>Vul de vragen in.</p>
+        </div>
+
+        <form id="form" class="grid-2">
+            <!-- Vraag 1 -->
+            <section class="card q" data-qid="q1" data-type="single-sum">
+                <div class="row">
+                    <h2>Vraag 1: Wat is je gevoel?</h2>
+                    <span class="badge"><span>Score:</span><strong class="score" data-score>–</strong></span>
+                </div>
+                <div class="opts">
+                    <label class="opt"><input type="radio" name="q1" value="Prima" data-weight="1"> Prima</label>
+                    <label class="opt"><input type="radio" name="q1" value="Stil" data-weight="4"> Stil</label>
+                    <label class="opt"><input type="radio" name="q1" value="Huilerig" data-weight="5"> Huilerig</label>
+                </div>
+                <div class="foot"><span class="note">1 keuze</span></div>
+            </section>
+
+            <!-- Vraag 2 -->
+            <section class="card q" data-qid="q2" data-type="avg-ceil">
+                <div class="row">
+                    <h2>Vraag 2: Lichamelijke sensaties</h2>
+                    <span class="badge"><span>Score:</span><strong class="score" data-score>–</strong></span>
+                </div>
+                <div class="opts">
+                    <label class="opt"><input type="checkbox" name="q2" value="Geen" data-weight="1"> Geen</label>
+                    <label class="opt"><input type="checkbox" name="q2" value="Ogen vallen beetje dicht" data-weight="3"> Ogen vallen beetje dicht</label>
+                    <label class="opt"><input type="checkbox" name="q2" value="Ogen vallen bijna dicht" data-weight="4"> Ogen vallen bijna dicht</label>
+                    <label class="opt"><input type="checkbox" name="q2" value="Buikpijn" data-weight="4"> Buikpijn</label>
+                    <label class="opt"><input type="checkbox" name="q2" value="Duizelig" data-weight="4"> Duizelig</label>
+                    <label class="opt"><input type="checkbox" name="q2" value="Staren" data-weight="5"> Staren</label>
+                    <label class="opt"><input type="checkbox" name="q2" value="keelpijn" data-weight="5"> keelpijn</label>
+                    <label class="opt"><input type="checkbox" name="q2" value="Ziek" data-weight="5"> Ziek</label>
+                </div>
+                <div class="foot"><span class="note">Meerdere keuzes toegestaan • Score = afgeronde bovengrens van het gemiddelde</span></div>
+            </section>
+
+            <!-- Vraag 3 -->
+            <section class="card q" data-qid="q3" data-type="single-sum">
+                <div class="row">
+                    <h2>Vraag 3: Gedachtes</h2>
+                    <span class="badge"><span>Score:</span><strong class="score" data-score>–</strong></span>
+                </div>
+                <div class="opts">
+                    <label class="opt"><input type="radio" name="q3" value="Veel gedachtes" data-weight="1"> Veel gedachtes</label>
+                    <label class="opt"><input type="radio" name="q3" value="Minder gedachtes" data-weight="4"> Minder gedachtes</label>
+                    <label class="opt"><input type="radio" name="q3" value="Afwezig" data-weight="5"> Afwezig</label>
+                </div>
+                <div class="foot"><span class="note">1 keuze</span></div>
+            </section>
+
+            <!-- Vraag 4 -->
+            <section class="card q" data-qid="q4" data-type="special-q4">
+                <div class="row">
+                    <h2>Vraag 4: Neiging om te doen</h2>
+                    <span class="badge"><span>Score:</span><strong class="score" data-score>–</strong></span>
+                </div>
+                <div class="opts">
+                    <label class="opt"><input type="checkbox" name="q4" value="Doorgaan" data-weight="0"> Doorgaan</label>
+                    <label class="opt"><input type="checkbox" name="q4" value="Chillen" data-weight="3"> Chillen</label>
+                    <label class="opt"><input type="checkbox" name="q4" value="Slapen" data-weight="5"> Slapen</label>
+                </div>
+                <div class="foot"><span class="note">Meerdere keuzes toegestaan • Speciale weging zoals in Excel</span></div>
+                <p class="note muted" data-q4-hint style="display:none">Let op: De combinatie die je koos bestaat niet in het Excel-wegingsmodel. Pas je keuze aan (bijv. kies <em>Doorgaan</em>, of <em>Chillen + Doorgaan</em>, of <em>Slapen</em>, of <em>Chillen + Slapen</em>, of alle drie).</p>
+            </section>
+        </form>
+
+        <section class="card result">
+            <div class="row">
+                <h2>Uitkomst</h2>
+                <div class="flex gap-2">
+                    <button class="btn" id="save-btn" type="button">Test opslaan</button>
+                    <button class="btn" id="reset" type="button">Alles wissen</button>
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <div class="note">Totaalscore (gemiddelde van 4 vragen)</div>
+                    <div class="big" id="total">–</div>
+                </div>
+                <div>
+                    <div class="note">Pannetje</div>
+                    <div class="big" id="pannetje">–</div>
+                </div>
+            </div>
+           
+        </section>
+
+        <!-- Nieuwe sectie voor geschiedenis en exporteren -->
+        <section class="card history-section">
+            <div class="row">
+                <h2>Geschiedenis van zelftests</h2>
+                <button class="btn" id="export-history-btn">Exporteer naar Excel</button>
+            </div>
+            <!-- Lijst om de geschiedenis op te slaan -->
+            <div id="history-list" class="history-list">
+                <p class="muted" id="no-history-text">Nog geen opgeslagen tests.</p>
+            </div>
+        </section>
+
+        
+    <script>
+        const q4Map = new Map([[-2, 1], [-1, 2], [2, 3], [4, 4], [3, 5]]);
+
+        /**
+         * Berekent de score voor een individuele vraagsectie.
+         * @param {HTMLElement} section De vraagsectie
+         * @returns {number|null} De berekende score of null als er geen antwoord is.
+         */
+        function computeQuestion(section) {
+            const type = section.dataset.type;
+            const inputs = [...section.querySelectorAll('input')];
+            const sel = inputs.filter(i => i.checked);
+            const weights = sel.map(i => Number(i.dataset.weight));
+            let score = null;
+
+            if (type === 'single-sum') {
+                if (sel.length === 0) score = null;
+                else score = weights.reduce((a, b) => a + b, 0);
+            } else if (type === 'avg-ceil') {
+                if (weights.length === 0) score = null;
+                else score = Math.ceil(weights.reduce((a, b) => a + b, 0) / weights.length);
+            } else if (type === 'special-q4') {
+                const hint = section.querySelector('[data-q4-hint]');
+                if (weights.length === 0) {
+                    score = null;
+                    hint.style.display = 'none';
+                } else {
+                    const s = weights.reduce((a, b) => a + b, 0);
+                    const c = weights.length;
+                    const d = s - 2 * c;
+                    if (q4Map.has(d)) {
+                        score = q4Map.get(d);
+                        hint.style.display = 'none';
+                    } else {
+                        score = null;
+                        hint.style.display = '';
+                    }
+                }
+            }
+            section.querySelector('[data-score]').textContent = (score == null ? '–' : String(score));
+            return score;
+        }
+
+        /**
+         * Berekent de totale score en de "Pannetje"-score.
+         * @returns {number|null} De berekende Pannetje-score of null.
+         */
+        function computeAll() {
+            const sections = [...document.querySelectorAll('section.q')];
+            const scores = sections.map(computeQuestion);
+            const valid = scores.filter(s => typeof s === 'number');
+            const totalEl = document.getElementById('total');
+            const panEl = document.getElementById('pannetje');
+
+            const allAnswered = valid.length === sections.length;
+
+            if (!allAnswered) {
+                totalEl.textContent = '–';
+                panEl.textContent = '–';
+                return null;
+            }
+
+            const avg = valid.reduce((a, b) => a + b, 0) / valid.length;
+            totalEl.textContent = avg.toFixed(2);
+            const pannetje = Math.ceil(avg);
+            panEl.textContent = pannetje;
+
+            return pannetje;
+        }
+
+        /**
+         * Haalt de huidige geselecteerde antwoorden op uit het formulier, inclusief de vraagtekst.
+         * @returns {object} Een object met de antwoorden.
+         */
+        function getAnswers() {
+            const answers = {};
+            const qSections = document.querySelectorAll('section.q');
+            qSections.forEach(section => {
+                const qid = section.dataset.qid;
+                const questionTitle = section.querySelector('h2').textContent.trim();
+                const selectedAnswers = [];
+                section.querySelectorAll('input:checked').forEach(input => {
+                    selectedAnswers.push(input.value);
+                });
+                answers[qid] = {
+                    title: questionTitle,
+                    selected: selectedAnswers
+                };
+            });
+            return answers;
+        }
+
+        /**
+         * Slaat de huidige test met score, datum en tijd op in localStorage.
+         */
+        function saveCurrentTest() {
+            const pannetjeScore = computeAll();
+            // Sla alleen op als alle vragen zijn beantwoord
+            if (pannetjeScore !== null) {
+                const history = JSON.parse(localStorage.getItem('pannetjesHistory') || '[]');
+                const now = new Date();
+                const newEntry = {
+                    timestamp: now.toISOString(),
+                    date: now.toLocaleDateString('nl-NL'),
+                    time: now.toLocaleTimeString('nl-NL'),
+                    answers: getAnswers(),
+                    score: pannetjeScore
+                };
+                history.unshift(newEntry);
+                localStorage.setItem('pannetjesHistory', JSON.stringify(history));
+                displayHistory();
+
+                // Verwijder alle selecties na het opslaan
+                document.querySelectorAll('input').forEach(i => i.checked = false);
+            }
+        }
+
+        /**
+         * Toont de opgeslagen geschiedenis in de UI.
+         */
+        function displayHistory() {
+            const historyList = document.getElementById('history-list');
+            const noHistoryText = document.getElementById('no-history-text');
+            const history = JSON.parse(localStorage.getItem('pannetjesHistory') || '[]').sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            if (history.length === 0) {
+                if (noHistoryText) noHistoryText.style.display = 'block';
+                historyList.innerHTML = `<p class="muted" id="no-history-text">Nog geen opgeslagen tests.</p>`;
+            } else {
+                if (noHistoryText) noHistoryText.style.display = 'none';
+                historyList.innerHTML = '';
+                history.forEach((entry) => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    const answersText = Object.keys(entry.answers).map(qid => {
+                        const answer = entry.answers[qid].selected.join(' & ');
+                        return answer ? `<strong>${qid.toUpperCase()}:</strong> ${answer}` : null;
+                    }).filter(Boolean).join(' | ');
+
+                    item.innerHTML = `
+                        <div class="row">
+                            <span class="muted">${entry.date} ${entry.time}</span>
+                            <span class="badge">
+                                <span>Pannetje:</span>
+                                <strong>${entry.score}</strong>
+                            </span>
+                        </div>
+                        <div class="note mt-1">
+                            ${answersText}
+                        </div>
+                    `;
+                    historyList.appendChild(item);
+                });
+            }
+        }
+
+        /**
+         * Exporteert de geschiedenis naar een CSV-bestand met aparte kolommen.
+         */
+        function exportHistory() {
+            const history = JSON.parse(localStorage.getItem('pannetjesHistory') || '[]');
+            if (history.length === 0) {
+                alert('Er is geen geschiedenis om te exporteren.');
+                return;
+            }
+
+            const headers = ["Datum", "Tijd", "Pannetje Score", "Q1 Gevoel", "Q2 Lichamelijke sensaties", "Q3 Gedachtes", "Q4 Neiging om te doen"];
+            let csvContent = headers.map(h => `"${h}"`).join(";") + "\n";
+
+            history.forEach(entry => {
+                const row = [
+                    `"${entry.date}"`,
+                    `"${entry.time}"`,
+                    `"${entry.score}"`,
+                    `"${entry.answers['q1'].selected.join(', ')}"`,
+                    `"${entry.answers['q2'].selected.join(', ')}"`,
+                    `"${entry.answers['q3'].selected.join(', ')}"`,
+                    `"${entry.answers['q4'].selected.join(', ')}"`
+                ];
+                csvContent += row.join(";") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'pannetjes_geschiedenis.csv';
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        document.getElementById('form').addEventListener('change', computeAll);
+        document.getElementById('save-btn').addEventListener('click', saveCurrentTest);
+        document.getElementById('reset').addEventListener('click', () => {
+            document.querySelectorAll('input').forEach(i => i.checked = false);
+            localStorage.removeItem('pannetjesHistory');
+            computeAll();
+            displayHistory();
+        });
+        document.getElementById('export-history-btn').addEventListener('click', exportHistory);
+
+        displayHistory();
+    </script>
+</body>
+</html>
